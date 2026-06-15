@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Upload History — PlantGuard AI</title>
+  <title>Upload History — Plant Disease Detection System</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
@@ -11,12 +11,12 @@
 <nav class="navbar">
   <div class="nav-brand">
     <span class="nav-icon">🌿</span>
-    <span class="nav-title">PlantGuard AI</span>
+    <span class="nav-title">Plant Disease Detection System</span>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link">Detect</a>
     <a href="/history" class="nav-link active">History</a>
-    <a href="/health" class="nav-link" target="_blank">Status</a>
+    <a href="/status" class="nav-link">Status</a>
   </div>
 </nav>
 
@@ -73,8 +73,9 @@
 
 </main>
 
-<footer class="footer">
-  <p>PlantGuard AI — Custom CNN trained on PlantVillage Dataset</p>
+<footer class="footer footer-main">
+  <div>Plant Disease Detection System</div>
+  <div class="footer-tech">Built with: TensorFlow · Flask · Python · Render</div>
 </footer>
 </body>
 </html>

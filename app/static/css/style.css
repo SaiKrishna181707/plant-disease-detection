@@ -1,5 +1,5 @@
 /* =============================================================================
-   style.css — PlantGuard AI Design System
+   style.css — Plant Disease Detection System Design
 ============================================================================= */
 
 :root {
@@ -73,9 +73,12 @@ body {
   text-align: center;
 }
 .hero-content { max-width: 680px; margin: 0 auto; }
-.hero-title   { color: white; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
-.hero-sub     { color: rgba(255,255,255,0.82); font-size: 1rem; line-height: 1.7; }
-
+  .hero-title   { color: white; font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
+  .hero-sub     { color: rgba(255,255,255,0.82); font-size: 1rem; line-height: 1.7; margin-bottom: 20px; }
+  .hero-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; max-width: 960px; margin: 0 auto; }
+  .stat-card { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: var(--radius-sm); padding: 18px; backdrop-filter: blur(10px); }
+  .stat-value { display: block; font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 6px; }
+  .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.78); letter-spacing: 0.8px; text-transform: uppercase; }
 /* ── Alerts ── */
 .alert {
   border-radius: var(--radius-sm);
@@ -99,6 +102,11 @@ body {
 @media (max-width: 760px) {
   .main-grid { grid-template-columns: 1fr; }
   .hero-title { font-size: 1.6rem; }
+  .hero-stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 520px) {
+  .hero-stats { grid-template-columns: 1fr; }
 }
 
 /* ── Cards ── */
@@ -321,4 +329,5 @@ body {
   padding: 20px;
   font-size: 0.82rem;
 }
-.footer a { color: var(--green-300); text-decoration: none; }
+.footer a { color: var(--green-300); text-decoration: none; }  .footer-main { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; }
+  .footer-tech { color: rgba(255,255,255,0.65); font-size: 0.82rem; }

@@ -69,6 +69,9 @@ def _build_top_k_result(probs: np.ndarray, class_map: dict, k: int) -> list:
     return results
 
 
+UNCERTAIN_THRESHOLD = 70.0
+
+
 def _format_name(raw: str) -> str:
     """
     Convert 'Tomato___Early_blight' or 'Pepper__bell___Bacterial_spot'
@@ -79,6 +82,14 @@ def _format_name(raw: str) -> str:
     if len(parts) >= 2:
         return f"{parts[0]}: {' '.join(parts[1:])}"
     return cleaned.title()
+
+
+def _apply_uncertainty(top_preds: list) -> list:
+    """Mark the top prediction uncertain when confidence is too low."""
+    if top_preds and top_preds[0]["confidence"] < UNCERTAIN_THRESHOLD:
+        top_preds[0]["class_name"] = "uncertain_prediction"
+        top_preds[0]["display_name"] = "Uncertain Prediction"
+    return top_preds
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -102,10 +113,12 @@ def predict_single_path(image_path: str, top_k: int = TOP_K) -> dict:
     probs     = model.predict(tensor, verbose=0)[0]        # (C,)
 
     top_preds = _build_top_k_result(probs, class_map, top_k)
+    top_preds = _apply_uncertainty(top_preds)
 
     # Add human-readable names
     for p in top_preds:
-        p["display_name"] = _format_name(p["class_name"])
+        if p["class_name"] != "uncertain_prediction":
+            p["display_name"] = _format_name(p["class_name"])
 
     return {
         "image_path":  image_path,
@@ -127,15 +140,10 @@ def predict_single_bytes(raw_bytes: bytes, filename: str = "upload",
     probs     = model.predict(tensor, verbose=0)[0]
 
     top_preds = _build_top_k_result(probs, class_map, top_k)
-    # Confidence threshold
-    if top_preds and top_preds[0]["confidence"] < 70:
-        top_preds[0]["display_name"] = "Uncertain Prediction"
-        top_preds[0]["class_name"] = "uncertain_prediction"
+    top_preds = _apply_uncertainty(top_preds)
 
     for p in top_preds:
-        if p["class_name"] == "uncertain_prediction":
-            p["display_name"] = "Uncertain Prediction"
-        else:
+        if p["class_name"] != "uncertain_prediction":
             p["display_name"] = _format_name(p["class_name"])
 
     return {
@@ -169,8 +177,10 @@ def predict_batch(image_paths: list, top_k: int = TOP_K,
     results = []
     for path, probs in zip(image_paths, all_probs):
         top_preds = _build_top_k_result(probs, class_map, top_k)
+        top_preds = _apply_uncertainty(top_preds)
         for p in top_preds:
-            p["display_name"] = _format_name(p["class_name"])
+            if p["class_name"] != "uncertain_prediction":
+                p["display_name"] = _format_name(p["class_name"])
         results.append({"image_path": path, "predictions": top_preds})
 
     if save_results:

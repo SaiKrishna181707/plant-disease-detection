@@ -1,192 +1,99 @@
-# 🌿 Plant Disease Detection — Custom CNN from Scratch
+# 🌿 Plant Disease Detection System
 
-> A production-quality deep learning system for automated plant disease
-> classification. **No pretrained models. No transfer learning.**
-> Every weight is trained from random initialisation on your PlantVillage data.
+A production-grade Flask + TensorFlow web app for crop disease identification using a custom Convolutional Neural Network trained on the PlantVillage dataset.
 
----
+## Overview
 
-## 📁 Project Structure
+This repository contains a complete plant disease detection pipeline:
+- image preprocessing and augmentation
+- custom CNN training from scratch
+- prediction and confidence handling
+- Flask web app with drag-and-drop image upload
+- upload history tracking and status dashboard
 
-```
-plant-disease-detection/
-│
-├── config.py                        ← All hyperparameters & paths
-├── requirements.txt
-├── README.md
-│
-├── dataset/                         ← PUT YOUR PLANTVILLAGE FOLDER HERE
-│   ├── Tomato___Early_blight/
-│   ├── Tomato___Late_blight/
-│   ├── Pepper__bell___healthy/
-│   └── ...  (all class folders)
-│
-├── models/                          ← Auto-created; stores trained model
-│   ├── plant_disease_cnn.keras
-│   └── class_names.json
-│
-├── results/                         ← Auto-created; stores plots & reports
-│   ├── training_history.png
-│   ├── training_history.json
-│   ├── confusion_matrix.png
-│   ├── per_class_accuracy.png
-│   ├── sample_grid.png
-│   ├── evaluation_report.json
-│   ├── batch_predictions.json
-│   ├── epoch_log.csv
-│   └── upload_history.json
-│
-├── utils/
-│   ├── dataset_loader.py            ← Auto-discovers classes, builds tf.data pipelines
-│   ├── preprocess.py                ← Single-image / batch preprocessing
-│   └── visualization.py            ← All plotting utilities
-│
-├── model/
-│   ├── build_model.py               ← Custom CNN architecture (scratch)
-│   ├── train.py                     ← Training entry point
-│   ├── evaluate.py                  ← Full evaluation + metrics
-│   └── predict.py                   ← Single & batch inference CLI
-│
-├── app/
-│   ├── app.py                       ← Flask web application
-│   ├── static/
-│   │   ├── css/style.css
-│   │   ├── js/app.js
-│   │   └── uploads/                 ← Uploaded images
-│   └── templates/
-│       ├── index.html               ← Upload + prediction UI
-│       └── history.html             ← Upload history page
-│
-└── logs/                            ← TensorBoard logs (auto-created)
-```
+The app now includes improved low-confidence handling for unrelated images, a branded UI, and a dashboard showing model readiness and runtime metadata.
 
----
+## Architecture
 
-## ⚡ Quick Start
+- `model/` — model architecture, training, evaluation, and inference logic
+- `utils/` — dataset loading, preprocessing, and visualization utilities
+- `app/` — Flask frontend, templates, and static assets
+- `config.py` — central application and training configuration
+- `README.md` — documentation and usage instructions
 
-### 1 · Install dependencies
+## Tech Stack
+
+- Python 3
+- TensorFlow / Keras
+- Flask
+- HTML/CSS/JavaScript
+- Render (deployment target)
+
+## Deployment URL
+
+The app is designed to deploy to Render or any Python web host.
+
+Example deployment URL:
+
+`https://your-render-app.onrender.com`
+
+Replace this with your actual Render service URL after deployment.
+
+## Screenshots
+
+1. **Detect page** — drag-and-drop uploader, hero stats, and prediction panel.
+2. **Status page** — runtime health dashboard, model state, TensorFlow version.
+3. **History page** — past image uploads with confidence and prediction details.
+
+> Add actual screenshot images here once available, e.g. `screenshots/detect.png`.
+
+## Run locally
+
+### 1. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2 · Place your dataset
-```
-plant-disease-detection/
-└── dataset/
-    ├── Tomato___Early_blight/    ← one sub-folder per class
-    ├── Tomato___Late_blight/
-    └── ...
-```
-The system **auto-detects all classes** — no hardcoding needed.
+### 2. Start the web app
 
-### 3 · Train the model
-```bash
-python model/train.py
-```
-- Discovers all classes automatically
-- Trains a 5-block custom CNN from scratch
-- Saves best checkpoint to `models/`
-- Generates training curves in `results/`
-
-### 4 · Evaluate
-```bash
-python model/evaluate.py
-```
-Outputs accuracy, precision, recall, F1, confusion matrix, per-class bars.
-
-### 5 · Predict from CLI
-```bash
-# Single image
-python model/predict.py --image path/to/leaf.jpg
-
-# Batch
-python model/predict.py --batch img1.jpg img2.jpg img3.jpg --top_k 3
-```
-
-### 6 · Launch web app
 ```bash
 python app/app.py
 ```
-Open **http://localhost:5000** — drag-drop a leaf image and get instant results.
 
-### 7 · TensorBoard
+### 3. Open in browser
+
+Visit `http://localhost:5000`.
+
+### 4. Use the web UI
+
+- drag and drop or click to upload a leaf image
+- check prediction confidence and disease advice
+- visit `/status` for system health info
+- visit `/history` to review upload history
+
+## CLI usage
+
+### Single image prediction
+
 ```bash
-tensorboard --logdir logs/
+python model/predict.py --image path/to/leaf.jpg
 ```
 
----
+### Batch prediction
 
-## 🧠 CNN Architecture (100% from scratch)
-
-```
-Input (128 × 128 × 3)
-│
-├─ Block 1 → Conv2D(32)  × 2 → BN → ReLU → MaxPool(2×2) → Dropout(0.25)
-├─ Block 2 → Conv2D(64)  × 2 → BN → ReLU → MaxPool(2×2) → Dropout(0.25)
-├─ Block 3 → Conv2D(128) × 2 → BN → ReLU → MaxPool(2×2) → Dropout(0.30)
-├─ Block 4 → Conv2D(256) × 2 → BN → ReLU → MaxPool(2×2) → Dropout(0.30)
-├─ Block 5 → Conv2D(512) × 1 → BN → ReLU → MaxPool(2×2) → Dropout(0.35)
-│
-├─ GlobalAveragePooling2D
-│
-├─ Dense(1024) → BN → ReLU → Dropout(0.50)
-├─ Dense(512)  → BN → ReLU → Dropout(0.40)
-│
-└─ Dense(N_CLASSES, Softmax)
+```bash
+python model/predict.py --batch img1.jpg img2.jpg img3.jpg --top_k 3
 ```
 
-**Key design decisions:**
-- `He normal` initialisation for all conv/dense weights (optimal for ReLU)
-- `L2 weight regularisation (1e-4)` on all conv and dense layers
-- `GlobalAveragePooling2D` instead of Flatten — fewer parameters, less overfitting
-- `BatchNormalization` after every conv layer — faster convergence, stable training
-- Progressive dropout (0.25 → 0.35 in conv, 0.40–0.50 in dense) — prevents co-adaptation
+## Notes
 
----
+- The app now flags predictions with top confidence below 70% as **Uncertain Prediction**.
+- Uncertain uploads show a warning and do not display misleading disease severity.
+- The status dashboard reports model loading, server uptime, TensorFlow version, and upload system state.
 
-## 📊 Training Features
+## Recommended next steps
 
-| Feature | Detail |
-|---------|--------|
-| Optimiser | Adam (β₁=0.9, β₂=0.999) |
-| Loss | Categorical Crossentropy |
-| Metrics | Accuracy, Top-3 Acc, Precision, Recall |
-| LR Schedule | ReduceLROnPlateau (factor=0.5, patience=5) |
-| Early Stopping | patience=12, restore best weights |
-| Checkpoint | Best val_accuracy saved automatically |
-| Class Weights | Computed per-class for imbalanced datasets |
-| Augmentation | Flip, brightness, contrast, saturation, crop+resize, rotation |
-| TensorBoard | Full histogram + scalar logging |
-
----
-
-## 🔧 Configuration
-
-Edit `config.py` to change anything:
-
-| Key | Default | Description |
-|-----|---------|-------------|
-| `IMG_HEIGHT / IMG_WIDTH` | 128 | Input resolution |
-| `BATCH_SIZE` | 32 | Training batch size |
-| `EPOCHS` | 50 | Maximum epochs |
-| `LEARNING_RATE` | 0.001 | Initial Adam LR |
-| `ES_PATIENCE` | 12 | Early stopping patience |
-| `TOP_K` | 3 | Top-K predictions |
-
----
-
-## 📋 Resume Bullet Points
-
-```
-• Built a custom 5-block CNN from scratch (no transfer learning) using
-  TensorFlow/Keras, training on 20k+ PlantVillage leaf images across
-  15+ disease classes with automatic class discovery.
-
-• Applied data augmentation (flip, rotation, crop, brightness/contrast),
-  BatchNormalization, and progressive Dropout regularisation, achieving
-  high multi-class validation accuracy with L2 weight decay.
-
-• Implemented a full ML pipeline including stratified splits, LR scheduling,
-  early stopping, TensorBoard logging, and a Flask web app with drag-drop
-  upload, top-3 confidence display, and disease treatment advice.
-```
+- Train the model locally with `python model/train.py`.
+- Deploy to Render using the Render Python service.
+- Replace the placeholder deployment URL in this README with the live site link.

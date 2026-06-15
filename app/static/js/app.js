@@ -1,5 +1,5 @@
 /* =============================================================================
-   app.js — PlantGuard AI Frontend Logic
+   app.js — Plant Disease Detection System Frontend Logic
    Handles: drag-drop upload, fetch prediction, render results
 ============================================================================= */
 
@@ -23,6 +23,7 @@
   const resultTopName  = document.getElementById("result-top-name");
   const resultTopConf  = document.getElementById("result-top-conf");
   const resultSeverity = document.getElementById("result-severity");
+  const resultWarning  = document.getElementById("result-warning");
   const predBars       = document.getElementById("pred-bars");
   const infoDesc       = document.getElementById("info-desc");
   const infoSymptoms   = document.getElementById("info-symptoms");
@@ -53,6 +54,14 @@
     if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
   });
 
+  dropZone.addEventListener("mouseenter", () => {
+    dropZone.classList.add("hover");
+  });
+
+  dropZone.addEventListener("mouseleave", () => {
+    dropZone.classList.remove("hover");
+  });
+
   function handleFile(file) {
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
     if (!allowed.includes(file.type)) {
@@ -69,6 +78,7 @@
     const url = URL.createObjectURL(file);
     previewImg.src = url;
     previewImg.style.display = "block";
+    previewImg.classList.add("preview-enter");
     dropHint.style.display   = "none";
     fileName.textContent     = `📎 ${file.name}`;
 
@@ -117,13 +127,22 @@
     resultTopName.textContent = top.display_name;
     resultTopConf.textContent = `Confidence: ${top.confidence}%`;
 
-    // Severity badge colour
-    const sev = info.severity || "";
-    resultSeverity.textContent = sev ? `Severity: ${sev}` : "";
-    resultSeverity.style.color =
-      sev.toLowerCase().includes("high")   ? "#e63946" :
-      sev.toLowerCase().includes("moderate") ? "#e08a46" :
-      sev.toLowerCase().includes("none")    ? "#2d6a4f" : "#555";
+    const isUncertain = top.class_name === "uncertain_prediction" || top.confidence < 70;
+    if (isUncertain) {
+      resultWarning.textContent = `⚠️ Uncertain Prediction — Confidence: ${top.confidence}%\nThis image may not belong to any supported disease category.`;
+      resultWarning.style.display = "block";
+      resultSeverity.textContent = "Severity: Unknown";
+      resultSeverity.style.color = "#b17704";
+    } else {
+      resultWarning.style.display = "none";
+      const sev = info.severity || "";
+      resultSeverity.textContent = sev ? `Severity: ${sev}` : "";
+      resultSeverity.style.color =
+        sev.toLowerCase().includes("high")      ? "#e63946" :
+        sev.toLowerCase().includes("moderate")  ? "#e08a46" :
+        sev.toLowerCase().includes("unknown")   ? "#b17704" :
+        sev.toLowerCase().includes("none")      ? "#2d6a4f" : "#555";
+    }
 
     // Prediction bars
     predBars.innerHTML = "";
@@ -165,7 +184,7 @@
 
   function setLoading(on) {
     analyseBtn.disabled    = on;
-    btnText.style.display  = on ? "none"   : "inline";
+    btnText.textContent    = on ? "Analyzing image..." : "Analyse Leaf";
     btnSpinner.style.display = on ? "inline-block" : "none";
   }
 

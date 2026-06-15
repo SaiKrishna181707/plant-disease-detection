@@ -8,6 +8,7 @@
 #    GET  /              → index / upload page
 #    POST /predict       → JSON inference endpoint
 #    GET  /history       → upload history page
+#    GET  /status        → system status dashboard
 #    GET  /health        → health check
 #    GET  /static/...    → static assets
 # =============================================================================
@@ -19,17 +20,17 @@ import uuid
 import base64
 import datetime
 
+import tensorflow as tf
 from flask import (
     Flask, request, render_template, jsonify,
-    redirect, url_for, send_from_directory
+    redirect, url_for
 )
-from werkzeug.utils import secure_filename
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from config import (
     FLASK_HOST, FLASK_PORT, MAX_UPLOAD_MB, ALLOWED_EXTS,
-    UPLOAD_DIR, RESULTS_DIR
+    UPLOAD_DIR, RESULTS_DIR, MODEL_FILENAME
 )
 from model.predict import predict_single_bytes, get_model, get_class_map
 
@@ -40,6 +41,7 @@ from model.predict import predict_single_bytes, get_model, get_class_map
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
 app.secret_key = os.urandom(24)
+APP_START = datetime.datetime.now()
 
 # In-memory upload history (cleared on restart)
 _upload_history = []
@@ -70,6 +72,12 @@ DISEASE_INFO = {
             "5. Consult your local agricultural extension office."
         ),
         "severity":    "Moderate — act promptly.",
+    },
+    "uncertain_prediction": {
+        "description": "The uploaded image does not match any disease class with sufficient confidence.",
+        "symptoms":    "Please upload a clear leaf image from a supported crop.",
+        "treatment":   "Retake the image and ensure the leaf occupies most of the frame.",
+        "severity":    "Unknown",
     },
     "blight": {
         "description": "Blight causes rapid browning and death of plant tissue.",
@@ -131,6 +139,9 @@ DISEASE_INFO = {
 
 def get_disease_info(class_name: str) -> dict:
     """Match class name to disease info using keyword lookup."""
+    if class_name == "uncertain_prediction":
+        return DISEASE_INFO["uncertain_prediction"]
+
     lower = class_name.lower()
     if "healthy" in lower:
         return DISEASE_INFO["healthy"]
@@ -223,6 +234,40 @@ def predict():
         return jsonify({"error": f"Prediction error: {str(e)}"}), 500
 
 
+@app.route("/status")
+def status():
+    model_ok = True
+    n_classes = 0
+    model_name = MODEL_FILENAME
+    tf_version = tf.__version__
+
+    try:
+        get_model()
+        n_classes = len(get_class_map())
+    except Exception:
+        model_ok = False
+
+    uptime_delta = datetime.datetime.now() - APP_START
+    uptime = str(uptime_delta).split(".")[0]
+
+    status_cards = [
+        {"label": "Model Loaded", "ok": model_ok},
+        {"label": "Flask Running", "ok": True},
+        {"label": "Prediction Engine Active", "ok": model_ok},
+        {"label": "Upload System Active", "ok": os.path.isdir(UPLOAD_DIR)},
+    ]
+
+    return render_template(
+        "status.html",
+        status_cards=status_cards,
+        model_name=model_name,
+        n_classes=n_classes,
+        tf_version=tf_version,
+        uptime=uptime,
+        history_count=len(_upload_history),
+    )
+
+
 @app.route("/history")
 def history():
     return render_template("history.html", history=_upload_history)
@@ -240,16 +285,23 @@ def clear_history():
 def health():
     model_ok = True
     try:
-        m = get_model()
+        get_model()
         c = get_class_map()
         n_classes = len(c)
-    except Exception as e:
+    except Exception:
         model_ok  = False
         n_classes = 0
+
+    uptime_delta = datetime.datetime.now() - APP_START
+    uptime = str(uptime_delta).split(".")[0]
+
     return jsonify({
         "status":    "ok" if model_ok else "model_not_loaded",
+        "model_file": MODEL_FILENAME,
         "n_classes": n_classes,
-        "history":   len(_upload_history),
+        "tensorflow": tf.__version__,
+        "uptime": uptime,
+        "upload_history": len(_upload_history),
     })
 
 

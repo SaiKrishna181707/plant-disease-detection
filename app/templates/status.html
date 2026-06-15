@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Status — Plant Disease Detection System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="nav-icon">🌿</span>
+    <span class="nav-title">Plant Disease Detection System</span>
+  </div>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Detect</a>
+    <a href="/history" class="nav-link">History</a>
+    <a href="/status" class="nav-link active">Status</a>
+  </div>
+</nav>
+
+<section class="hero status-hero">
+  <div class="hero-content">
+    <h1 class="hero-title">System Status</h1>
+    <p class="hero-sub">
+      Monitor application health, model readiness, and prediction service availability in one place.
+    </p>
+  </div>
+</section>
+
+<main class="main-grid status-grid" style="padding: 20px 20px 60px; max-width:1100px; margin: -48px auto 40px;">
+  <div class="card status-card status-card-full">
+    <h2 class="card-title">System Overview</h2>
+    <div class="status-summary">
+      <div>
+        <div class="status-label">Model file</div>
+        <div class="status-value">{{ model_name }}</div>
+      </div>
+      <div>
+        <div class="status-label">Number of classes</div>
+        <div class="status-value">{{ n_classes }}</div>
+      </div>
+      <div>
+        <div class="status-label">TensorFlow version</div>
+        <div class="status-value">{{ tf_version }}</div>
+      </div>
+      <div>
+        <div class="status-label">Server uptime</div>
+        <div class="status-value">{{ uptime }}</div>
+      </div>
+      <div>
+        <div class="status-label">History entries</div>
+        <div class="status-value">{{ history_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  {% for card in status_cards %}
+  <div class="card status-card">
+    <div class="status-card-icon">{{ '🟢' if card.ok else '🔴' }}</div>
+    <div>
+      <div class="status-card-label">{{ card.label }}</div>
+      <div class="status-card-state">{{ 'Active' if card.ok else 'Offline' }}</div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="card status-card status-card-full">
+    <h2 class="card-title">Notes</h2>
+    <p style="margin:0; color: var(--muted); line-height:1.7;">
+      Use this dashboard to confirm that the Flask server is running, the model has been loaded correctly, and the upload/prediction pipeline is available.
+      If the model is not loaded, run <code>python model/train.py</code> to train the model first.
+    </p>
+  </div>
+</main>
+
+<footer class="footer footer-main">
+  <div>Plant Disease Detection System</div>
+  <div class="footer-tech">Built with: TensorFlow · Flask · Python · Render</div>
+</footer>
+
+</body>
+</html>
