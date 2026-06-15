@@ -127,9 +127,16 @@ def predict_single_bytes(raw_bytes: bytes, filename: str = "upload",
     probs     = model.predict(tensor, verbose=0)[0]
 
     top_preds = _build_top_k_result(probs, class_map, top_k)
+    # Confidence threshold
+    if top_preds and top_preds[0]["confidence"] < 70:
+        top_preds[0]["display_name"] = "Uncertain Prediction"
+        top_preds[0]["class_name"] = "uncertain_prediction"
 
     for p in top_preds:
-        p["display_name"] = _format_name(p["class_name"])
+        if p["class_name"] == "uncertain_prediction":
+            p["display_name"] = "Uncertain Prediction"
+        else:
+            p["display_name"] = _format_name(p["class_name"])
 
     return {
         "image_path":  filename,
