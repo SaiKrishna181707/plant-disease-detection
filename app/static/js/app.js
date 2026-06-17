@@ -171,13 +171,17 @@
       });
     });
 
+    // Top-line results
+    document.getElementById("result-info-class").textContent      = top.display_name;
+    document.getElementById("result-info-confidence").textContent = `${top.confidence}%`;
+    document.getElementById("result-info-severity").textContent   = resultSeverity.textContent.replace("Severity: ", "") || "Unknown";
+
     // Disease info
     infoDesc.textContent      = info.description || "—";
     infoSymptoms.textContent  = info.symptoms    || "—";
     infoTreatment.textContent = info.treatment   || "Consult an agricultural expert.";
 
     resultsCard.style.display = "block";
-    resultsCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

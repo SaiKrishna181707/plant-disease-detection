@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Status — Plant Disease Detection System</title>
+  <title>Status — Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
@@ -11,7 +11,7 @@
 <nav class="navbar">
   <div class="nav-brand">
     <span class="nav-icon">🌿</span>
-    <span class="nav-title">Plant Disease Detection System</span>
+    <span class="nav-title">Plant Disease Detection</span>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link">Detect</a>
@@ -22,41 +22,41 @@
 
 <section class="hero">
   <div class="hero-content">
-    <h1 class="hero-title">System Status</h1>
-    <p class="hero-sub">Monitor application health and model readiness</p>
+    <div class="hero-left">
+      <h1 class="hero-title">System Status</h1>
+      <p class="hero-sub">Compact dashboard for model readiness and deployment health.</p>
+    </div>
+    <span class="hero-chip">Live monitoring • Resume-ready</span>
   </div>
 </section>
 
-<main style="max-width:1400px; margin:0 auto; padding:1.5rem">
-
-  <!-- System Overview -->
+<main class="container">
   <div class="status-summary">
-    <div>
+    <div class="status-summary-card">
       <div class="status-label">Model</div>
       <div class="status-value">{{ model_name }}</div>
     </div>
-    <div>
+    <div class="status-summary-card">
       <div class="status-label">Classes</div>
       <div class="status-value">{{ n_classes }}</div>
     </div>
-    <div>
+    <div class="status-summary-card">
       <div class="status-label">TensorFlow</div>
       <div class="status-value">{{ tf_version }}</div>
     </div>
-    <div>
+    <div class="status-summary-card">
       <div class="status-label">Uptime</div>
       <div class="status-value">{{ uptime }}</div>
     </div>
-    <div>
+    <div class="status-summary-card">
       <div class="status-label">Predictions</div>
       <div class="status-value">{{ history_count }}</div>
     </div>
   </div>
 
-  <!-- Status Cards Grid -->
   <div class="status-grid">
     {% for card in status_cards %}
-    <div class="card status-card">
+    <div class="status-card">
       <span class="status-icon">{{ '✓' if card.ok else '✗' }}</span>
       <div class="status-content">
         <div class="status-label">{{ card.label }}</div>
@@ -66,12 +66,11 @@
     </div>
     {% endfor %}
   </div>
-
 </main>
 
 <footer class="footer footer-main">
-  <div>Plant Disease Detection System</div>
-  <div class="footer-tech">Built with: TensorFlow · Flask · Python · Render</div>
+  <div>Model Ready • 15 Classes • Custom 5-Block CNN • TensorFlow • Flask</div>
+  <div class="footer-tech">Plant Disease Detection</div>
 </footer>
 
 </body>

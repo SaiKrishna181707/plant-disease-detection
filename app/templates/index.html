@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plant Disease Detection System</title>
+  <title>Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
 
-<!-- ── Navigation ── -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="nav-icon">🌿</span>
-    <span class="nav-title">Plant Disease Detection System</span>
+    <span class="nav-title">Plant Disease Detection</span>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link active">Detect</a>
@@ -21,27 +20,26 @@
   </div>
 </nav>
 
-<!-- ── Hero ── -->
 <section class="hero">
   <div class="hero-content">
-    <h1 class="hero-title">Plant Disease Detection</h1>
-    <p class="hero-sub">AI-powered crop disease diagnosis using CNN</p>
+    <div class="hero-left">
+      <h1 class="hero-title">Plant Disease Detection</h1>
+      <p class="hero-sub">Professional agricultural AI for fast leaf disease diagnosis.</p>
+    </div>
+    <span class="hero-chip">Compact, resume-ready dashboard</span>
   </div>
 </section>
 
-<!-- ── Main content (2-column layout) ── -->
 <main class="main-grid">
-
-  <!-- LEFT COLUMN: Upload (40%) -->
   <div class="card upload-card">
     <h2 class="card-title">📷 Upload Image</h2>
 
     <div id="drop-zone" class="drop-zone">
-      <img id="preview-img" class="preview-img" src="" alt="preview" />
+      <img id="preview-img" class="preview-img" src="" alt="Preview" />
       <div id="drop-hint" class="drop-hint">
         <div class="drop-icon">🍃</div>
-        <p><strong>Drag & drop</strong> or click</p>
-        <p class="drop-sub">JPG, PNG, WEBP — max 16 MB</p>
+        <p><strong>Drag & drop</strong> a leaf image, or click to select.</p>
+        <p class="drop-sub">Supported: JPG, PNG, WEBP • Max 16 MB</p>
       </div>
       <p id="file-name" class="file-name"></p>
     </div>
@@ -49,20 +47,18 @@
     <input type="file" id="file-input" accept="image/*" style="display:none" />
 
     <button id="analyse-btn" class="btn btn-primary" disabled>
-      <span id="btn-text">Analyse</span>
+      <span id="btn-text">Analyze Leaf</span>
       <span id="btn-spinner" class="btn-spinner" style="display:none"></span>
     </button>
 
     <div id="error-box" class="alert alert-error" style="display:none"></div>
   </div>
 
-  <!-- RIGHT COLUMN: Results (60%) -->
   <div id="results-card" class="card results-card" style="display:none">
-
-    <h2 class="card-title">🔬 Results</h2>
+    <h2 class="card-title">🔬 Detection Results</h2>
 
     <div class="result-hero">
-      <img id="result-thumb" class="result-thumb" src="" alt="" />
+      <img id="result-thumb" class="result-thumb" src="" alt="Result preview" />
       <div class="result-hero-text">
         <div id="result-top-name" class="result-top-name"></div>
         <div id="result-top-conf" class="result-top-conf"></div>
@@ -72,13 +68,25 @@
 
     <div id="result-warning" class="alert alert-warn" style="display:none;"></div>
 
-    <!-- Top-K prediction bars -->
-    <h3 class="pred-label">Top Predictions</h3>
+    <div class="result-info">
+      <div class="result-info-item">
+        <strong>Top class</strong>
+        <span id="result-info-class">—</span>
+      </div>
+      <div class="result-info-item">
+        <strong>Confidence</strong>
+        <span id="result-info-confidence">—</span>
+      </div>
+      <div class="result-info-item">
+        <strong>Severity</strong>
+        <span id="result-info-severity">—</span>
+      </div>
+    </div>
+
+    <h3 class="pred-label">Top predictions</h3>
     <div id="pred-bars" class="pred-bars"></div>
 
-    <!-- Disease information -->
     <div id="disease-panel" class="disease-panel">
-      <h3 class="info-label">📋 Details</h3>
       <div class="info-grid">
         <div class="info-block">
           <div class="info-label">Description</div>
@@ -90,17 +98,53 @@
         </div>
       </div>
 
-      <h3 class="info-label" style="margin-top:0.8rem">Treatment</h3>
-      <div id="info-treatment" class="treatment-box"></div>
+      <div class="info-block">
+        <div class="info-label">Treatment</div>
+        <div id="info-treatment" class="info-value"></div>
+      </div>
     </div>
-
   </div>
-
 </main>
 
+<section class="how-section">
+  <div class="how-header">
+    <h2 class="how-title">How it works</h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <span class="how-badge">1</span>
+      <div class="how-card-body">
+        <div class="how-card-title">Upload</div>
+        <div class="how-card-text">Drag and drop a leaf image into the upload area.</div>
+      </div>
+    </div>
+    <div class="how-card">
+      <span class="how-badge">2</span>
+      <div class="how-card-body">
+        <div class="how-card-title">Preprocess</div>
+        <div class="how-card-text">The image is prepared for reliable model inference.</div>
+      </div>
+    </div>
+    <div class="how-card">
+      <span class="how-badge">3</span>
+      <div class="how-card-body">
+        <div class="how-card-title">CNN Inference</div>
+        <div class="how-card-text">A custom convolutional neural network predicts leaf disease.</div>
+      </div>
+    </div>
+    <div class="how-card">
+      <span class="how-badge">4</span>
+      <div class="how-card-body">
+        <div class="how-card-title">Results</div>
+        <div class="how-card-text">See the detected disease, confidence, and treatment guidance.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer class="footer footer-main">
-  <div>Plant Disease Detection System</div>
-  <div class="footer-tech">Built with: TensorFlow · Flask · Python · Render</div>
+  <div>Model Ready • 15 Classes • Custom 5-Block CNN • TensorFlow • Flask</div>
+  <div class="footer-tech">Plant Disease Detection</div>
 </footer>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

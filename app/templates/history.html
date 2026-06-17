@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Upload History — Plant Disease Detection System</title>
+  <title>History — Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
@@ -11,7 +11,7 @@
 <nav class="navbar">
   <div class="nav-brand">
     <span class="nav-icon">🌿</span>
-    <span class="nav-title">Plant Disease Detection System</span>
+    <span class="nav-title">Plant Disease Detection</span>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link">Detect</a>
@@ -20,19 +20,20 @@
   </div>
 </nav>
 
-<section class="hero" style="padding: 1.2rem 1.5rem">
+<section class="hero">
   <div class="hero-content">
-    <h1 class="hero-title">Prediction History</h1>
-    <p class="hero-sub">Recent detections from this session</p>
+    <div class="hero-left">
+      <h1 class="hero-title">Prediction History</h1>
+      <p class="hero-sub">Recent detections from this session.</p>
+    </div>
+    <span class="hero-chip">Modern history cards</span>
   </div>
 </section>
 
-<main style="max-width:1400px; margin:0 auto; padding: 0">
-
+<main class="container">
   {% if history %}
-  <div style="display:flex; justify-content:flex-end; padding:1rem 1.5rem">
-    <form action="/history/clear" method="POST"
-          onsubmit="return confirm('Clear all history?')">
+  <div style="display:flex; justify-content:flex-end; padding:1rem 1.5rem 0;">
+    <form action="/history/clear" method="POST" onsubmit="return confirm('Clear all history?')">
       <button class="btn btn-danger">🗑 Clear</button>
     </form>
   </div>
@@ -41,14 +42,15 @@
     {% for entry in history %}
     <div class="hist-card">
       <div class="hist-img-wrap">
-        <img src="data:image/jpeg;base64,{{ entry.image_b64 }}"
-             alt="{{ entry.filename }}" class="hist-img" />
+        <img src="data:image/jpeg;base64,{{ entry.image_b64 }}" alt="{{ entry.filename }}" class="hist-img" />
       </div>
       <div class="hist-body">
         <div class="hist-label">{{ entry.top_class }}</div>
-        <div class="hist-conf">{{ entry.confidence }}%</div>
-        <div class="hist-time">{{ entry.timestamp }}</div>
-        <div class="hist-file">{{ entry.filename }}</div>
+        <div class="hist-conf">Confidence: {{ entry.confidence }}%</div>
+        <div class="hist-card-footer">
+          <span>{{ entry.timestamp }}</span>
+          <span>{{ entry.filename }}</span>
+        </div>
       </div>
     </div>
     {% endfor %}
@@ -61,12 +63,11 @@
     <p>Upload a leaf image on the <a href="/">Detect</a> page to get started.</p>
   </div>
   {% endif %}
-
 </main>
 
 <footer class="footer footer-main">
-  <div>Plant Disease Detection System</div>
-  <div class="footer-tech">Built with: TensorFlow · Flask · Python · Render</div>
+  <div>Model Ready • 15 Classes • Custom 5-Block CNN • TensorFlow • Flask</div>
+  <div class="footer-tech">Plant Disease Detection</div>
 </footer>
 </body>
 </html>
