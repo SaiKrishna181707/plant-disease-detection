@@ -1,37 +1,33 @@
 /* =============================================================================
-   app.js — Plant Disease Detection System Frontend Logic
-   Handles: drag-drop upload, fetch prediction, render results
+   app.js � Frontend logic for Plant Disease Detection
+   Handles upload, prediction fetch, and results rendering
 ============================================================================= */
-
 (function () {
   "use strict";
 
-  // ── DOM refs ──────────────────────────────────────────────────────────────
-  const dropZone    = document.getElementById("drop-zone");
-  const fileInput   = document.getElementById("file-input");
-  const previewImg  = document.getElementById("preview-img");
-  const dropHint    = document.getElementById("drop-hint");
-  const fileName    = document.getElementById("file-name");
-  const analyseBtn  = document.getElementById("analyse-btn");
-  const btnText     = document.getElementById("btn-text");
-  const btnSpinner  = document.getElementById("btn-spinner");
-  const errorBox    = document.getElementById("error-box");
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input");
+  const previewImg = document.getElementById("preview-img");
+  const fileName = document.getElementById("file-name");
+  const analyseBtn = document.getElementById("analyse-btn");
+  const btnText = document.getElementById("btn-text");
+  const btnSpinner = document.getElementById("btn-spinner");
+  const errorBox = document.getElementById("error-box");
   const resultsCard = document.getElementById("results-card");
-
-  // Results fields
-  const resultThumb    = document.getElementById("result-thumb");
-  const resultTopName  = document.getElementById("result-top-name");
-  const resultTopConf  = document.getElementById("result-top-conf");
+  const resultThumb = document.getElementById("result-thumb");
+  const resultTopName = document.getElementById("result-top-name");
+  const resultTopConf = document.getElementById("result-top-conf");
   const resultSeverity = document.getElementById("result-severity");
-  const resultWarning  = document.getElementById("result-warning");
-  const predBars       = document.getElementById("pred-bars");
-  const infoDesc       = document.getElementById("info-desc");
-  const infoSymptoms   = document.getElementById("info-symptoms");
-  const infoTreatment  = document.getElementById("info-treatment");
+  const resultWarning = document.getElementById("result-warning");
+  const predBars = document.getElementById("pred-bars");
+  const infoDesc = document.getElementById("info-desc");
+  const infoSymptoms = document.getElementById("info-symptoms");
+  const infoTreatment = document.getElementById("info-treatment");
+  const resultInfoClass = document.getElementById("result-info-class");
+  const resultInfoConfidence = document.getElementById("result-info-confidence");
+  const resultInfoSeverity = document.getElementById("result-info-severity");
 
   let selectedFile = null;
-
-  // ── File selection ────────────────────────────────────────────────────────
 
   dropZone.addEventListener("click", () => fileInput.click());
 
@@ -54,14 +50,6 @@
     if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
   });
 
-  dropZone.addEventListener("mouseenter", () => {
-    dropZone.classList.add("hover");
-  });
-
-  dropZone.addEventListener("mouseleave", () => {
-    dropZone.classList.remove("hover");
-  });
-
   function handleFile(file) {
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
     if (!allowed.includes(file.type)) {
@@ -74,20 +62,14 @@
     }
 
     selectedFile = file;
-
     const url = URL.createObjectURL(file);
     previewImg.src = url;
     previewImg.style.display = "block";
-    previewImg.classList.add("preview-enter");
-    dropHint.style.display   = "none";
-    fileName.textContent     = `📎 ${file.name}`;
-
+    fileName.textContent = `?? ${file.name}`;
     analyseBtn.disabled = false;
     hideError();
     resultsCard.style.display = "none";
   }
-
-  // ── Analyse ───────────────────────────────────────────────────────────────
 
   analyseBtn.addEventListener("click", async () => {
     if (!selectedFile) return;
@@ -100,14 +82,12 @@
     form.append("file", selectedFile);
 
     try {
-      const res  = await fetch("/predict", { method: "POST", body: form });
+      const res = await fetch("/predict", { method: "POST", body: form });
       const data = await res.json();
-
       if (!res.ok || data.error) {
         showError(data.error || "Server returned an error.");
         return;
       }
-
       renderResults(data);
     } catch (err) {
       showError("Network error: " + err.message);
@@ -116,35 +96,39 @@
     }
   });
 
-  // ── Render results ────────────────────────────────────────────────────────
-
   function renderResults(data) {
-    const top  = data.predictions[0];
+    const top = data.predictions[0];
     const info = data.disease_info || {};
 
-    // Thumb + headline
-    resultThumb.src        = data.image_data;
+    resultThumb.src = data.image_data;
     resultTopName.textContent = top.display_name;
     resultTopConf.textContent = `Confidence: ${top.confidence}%`;
+    resultInfoClass.textContent = top.display_name;
+    resultInfoConfidence.textContent = `${top.confidence}%`;
 
-    const isUncertain = top.class_name === "uncertain_prediction" || top.confidence < 70;
-    if (isUncertain) {
-      resultWarning.textContent = `⚠️ Uncertain Prediction — Confidence: ${top.confidence}%\nThis image may not belong to any supported disease category.`;
+    const isLowConfidence = top.class_name === "uncertain_prediction" || top.confidence < 70;
+    if (isLowConfidence) {
+      resultWarning.textContent = "? Low Confidence Prediction � This image may not belong to a supported crop class or the image quality may be insufficient.";
       resultWarning.style.display = "block";
-      resultSeverity.textContent = "Severity: Unknown";
-      resultSeverity.style.color = "#b17704";
+      resultSeverity.textContent = "Low confidence";
+      resultSeverity.style.background = "rgba(250, 204, 21, 0.18)";
+      resultSeverity.style.color = "#facc15";
+      resultInfoSeverity.textContent = "Low";
+      infoDesc.textContent = info.description || "Prediction confidence is low. Retake the image for a more reliable result.";
+      infoSymptoms.textContent = info.symptoms || "Prediction confidence is low. Retake the image for a more reliable result.";
+      infoTreatment.textContent = "Treatment recommendations are withheld for low confidence predictions.";
     } else {
       resultWarning.style.display = "none";
-      const sev = info.severity || "";
-      resultSeverity.textContent = sev ? `Severity: ${sev}` : "";
-      resultSeverity.style.color =
-        sev.toLowerCase().includes("high")      ? "#e63946" :
-        sev.toLowerCase().includes("moderate")  ? "#e08a46" :
-        sev.toLowerCase().includes("unknown")   ? "#b17704" :
-        sev.toLowerCase().includes("none")      ? "#2d6a4f" : "#555";
+      const severity = info.severity || "Unknown";
+      resultSeverity.textContent = severity;
+      resultSeverity.style.background = "rgba(46, 125, 50, 0.18)";
+      resultSeverity.style.color = "var(--success)";
+      resultInfoSeverity.textContent = severity;
+      infoDesc.textContent = info.description || "�";
+      infoSymptoms.textContent = info.symptoms || "�";
+      infoTreatment.textContent = info.treatment || "Consult an agricultural expert.";
     }
 
-    // Prediction bars
     predBars.innerHTML = "";
     data.predictions.forEach((p, i) => {
       const item = document.createElement("div");
@@ -155,14 +139,11 @@
           <span class="pred-conf">${p.confidence}%</span>
         </div>
         <div class="pred-bg">
-          <div class="pred-fill ${i === 0 ? "top" : ""}"
-               style="width:0%"
-               data-w="${p.confidence}"></div>
+          <div class="pred-fill ${i === 0 ? "top" : ""}" style="width:0%" data-w="${p.confidence}"></div>
         </div>`;
       predBars.appendChild(item);
     });
 
-    // Animate bars after paint
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         document.querySelectorAll(".pred-fill").forEach((bar) => {
@@ -171,34 +152,21 @@
       });
     });
 
-    // Top-line results
-    document.getElementById("result-info-class").textContent      = top.display_name;
-    document.getElementById("result-info-confidence").textContent = `${top.confidence}%`;
-    document.getElementById("result-info-severity").textContent   = resultSeverity.textContent.replace("Severity: ", "") || "Unknown";
-
-    // Disease info
-    infoDesc.textContent      = info.description || "—";
-    infoSymptoms.textContent  = info.symptoms    || "—";
-    infoTreatment.textContent = info.treatment   || "Consult an agricultural expert.";
-
     resultsCard.style.display = "block";
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
   function setLoading(on) {
-    analyseBtn.disabled    = on;
-    btnText.textContent    = on ? "Analyzing image..." : "Analyse Leaf";
+    analyseBtn.disabled = on;
+    btnText.textContent = on ? "Analyzing image..." : "Analyze Leaf";
     btnSpinner.style.display = on ? "inline-block" : "none";
   }
 
   function showError(msg) {
-    errorBox.textContent   = "⚠️  " + msg;
+    errorBox.textContent = "? " + msg;
     errorBox.style.display = "block";
   }
 
   function hideError() {
     errorBox.style.display = "none";
   }
-
 })();

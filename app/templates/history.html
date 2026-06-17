@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>History â€” Plant Disease Detection</title>
+  <title>History — Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
 
 <nav class="navbar">
   <div class="nav-brand">
-    <span class="nav-icon">ðŸŒ¿</span>
+    <span class="nav-icon">??</span>
     <span class="nav-title">Plant Disease Detection</span>
   </div>
   <div class="nav-links">
@@ -24,49 +24,46 @@
   <div class="hero-content">
     <div class="hero-left">
       <h1 class="hero-title">Prediction History</h1>
-      <p class="hero-sub">Recent detections from this session.</p>
+      <p class="hero-sub">Review recent detections with confidence and timestamps.</p>
     </div>
     <span class="hero-chip">Modern history cards</span>
   </div>
 </section>
 
-<main class="container">
-  {% if history %}
-  <div style="display:flex; justify-content:flex-end; padding:1rem 1.5rem 0;">
-    <form action="/history/clear" method="POST" onsubmit="return confirm('Clear all history?')">
-      <button class="btn btn-danger">ðŸ—‘ Clear</button>
-    </form>
-  </div>
+<div style="display:flex; justify-content:flex-end; padding:1rem 2rem 0;">
+  <form action="/history/clear" method="POST" onsubmit="return confirm('Clear all history?')">
+    <button class="btn btn-primary">?? Clear history</button>
+  </form>
+</div>
 
-  <div class="history-grid">
+<main class="history-grid">
+  {% if history %}
     {% for entry in history %}
-    <div class="hist-card">
-      <div class="hist-img-wrap">
-        <img src="data:image/jpeg;base64,{{ entry.image_b64 }}" alt="{{ entry.filename }}" class="hist-img" />
-      </div>
-      <div class="hist-body">
-        <div class="hist-label">{{ entry.top_class }}</div>
-        <div class="hist-conf">Confidence: {{ entry.confidence }}%</div>
-        <div class="hist-card-footer">
-          <span>{{ entry.timestamp }}</span>
-          <span>{{ entry.filename }}</span>
+      <div class="hist-card">
+        <div class="hist-img-wrap">
+          <img src="data:image/jpeg;base64,{{ entry.image_b64 }}" alt="{{ entry.filename }}" class="hist-img" />
+        </div>
+        <div class="hist-body">
+          <div class="hist-label">{{ entry.top_class }}</div>
+          <div class="hist-conf">Confidence: {{ entry.confidence }}%</div>
+          <div class="hist-card-footer">
+            <span>{{ entry.timestamp }}</span>
+            <span>{{ entry.filename }}</span>
+          </div>
         </div>
       </div>
-    </div>
     {% endfor %}
-  </div>
-
   {% else %}
-  <div class="empty-state">
-    <div class="empty-state-icon">ðŸ“‹</div>
-    <h2>No predictions yet</h2>
-    <p>Upload a leaf image on the <a href="/">Detect</a> page to get started.</p>
-  </div>
+    <div class="empty-state">
+      <div class="empty-state-icon">??</div>
+      <h2>No predictions yet</h2>
+      <p>Upload a leaf image on the <a href="/">Detect</a> page to get started.</p>
+    </div>
   {% endif %}
 </main>
 
 <footer class="footer footer-main">
-  <div>Model Ready â€¢ 15 Classes â€¢ Custom 5-Block CNN â€¢ TensorFlow â€¢ Flask</div>
+  <div>Model Ready • 15 Classes • Custom 5-Block CNN • TensorFlow • Flask</div>
   <div class="footer-tech">Plant Disease Detection</div>
 </footer>
 </body>

@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Status â€” Plant Disease Detection</title>
+  <title>Status — Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
 
 <nav class="navbar">
   <div class="nav-brand">
-    <span class="nav-icon">ðŸŒ¿</span>
+    <span class="nav-icon">??</span>
     <span class="nav-title">Plant Disease Detection</span>
   </div>
   <div class="nav-links">
@@ -24,54 +24,77 @@
   <div class="hero-content">
     <div class="hero-left">
       <h1 class="hero-title">System Status</h1>
-      <p class="hero-sub">Compact dashboard for model readiness and deployment health.</p>
+      <p class="hero-sub">Live model health metrics for your deployment dashboard.</p>
     </div>
-    <span class="hero-chip">Live monitoring â€¢ Resume-ready</span>
+    <span class="hero-chip">Recruiter-ready status page</span>
   </div>
 </section>
 
-<main class="container">
-  <div class="status-summary">
-    <div class="status-summary-card">
-      <div class="status-label">Model</div>
-      <div class="status-value">{{ model_name }}</div>
+<div class="status-summary">
+  <div class="status-summary-card">
+    <div class="status-label">Model</div>
+    <div class="status-value">{{ model_name }}</div>
+  </div>
+  <div class="status-summary-card">
+    <div class="status-label">Classes</div>
+    <div class="status-value">{{ n_classes }}</div>
+  </div>
+  <div class="status-summary-card">
+    <div class="status-label">Framework</div>
+    <div class="status-value">TensorFlow</div>
+  </div>
+  <div class="status-summary-card">
+    <div class="status-label">Deployment</div>
+    <div class="status-value">Flask + Render</div>
+  </div>
+</div>
+
+<div class="status-grid">
+  <div class="status-card">
+    <span class="status-icon">??</span>
+    <div class="status-content">
+      <div class="status-label">Model Loaded</div>
+      <div class="status-value">{{ 'Active' if status_cards[0].ok else 'Offline' }}</div>
+      <div class="status-state">{{ 'OK' if status_cards[0].ok else 'Error' }}</div>
     </div>
-    <div class="status-summary-card">
+  </div>
+  <div class="status-card">
+    <span class="status-icon">??</span>
+    <div class="status-content">
       <div class="status-label">Classes</div>
       <div class="status-value">{{ n_classes }}</div>
+      <div class="status-state">15 Classes</div>
     </div>
-    <div class="status-summary-card">
+  </div>
+  <div class="status-card">
+    <span class="status-icon">??</span>
+    <div class="status-content">
+      <div class="status-label">Model Architecture</div>
+      <div class="status-value">Custom 5-Block CNN</div>
+      <div class="status-state">High performance</div>
+    </div>
+  </div>
+  <div class="status-card">
+    <span class="status-icon">?</span>
+    <div class="status-content">
       <div class="status-label">TensorFlow</div>
       <div class="status-value">{{ tf_version }}</div>
-    </div>
-    <div class="status-summary-card">
-      <div class="status-label">Uptime</div>
-      <div class="status-value">{{ uptime }}</div>
-    </div>
-    <div class="status-summary-card">
-      <div class="status-label">Predictions</div>
-      <div class="status-value">{{ history_count }}</div>
+      <div class="status-state">Production ready</div>
     </div>
   </div>
-
-  <div class="status-grid">
-    {% for card in status_cards %}
-    <div class="status-card">
-      <span class="status-icon">{{ 'âœ“' if card.ok else 'âœ—' }}</span>
-      <div class="status-content">
-        <div class="status-label">{{ card.label }}</div>
-        <div class="status-value">{{ 'Active' if card.ok else 'Offline' }}</div>
-        <div class="status-state">{{ 'OK' if card.ok else 'Error' }}</div>
-      </div>
+  <div class="status-card">
+    <span class="status-icon">??</span>
+    <div class="status-content">
+      <div class="status-label">Flask + Render</div>
+      <div class="status-value">Live deployment</div>
+      <div class="status-state">Stable</div>
     </div>
-    {% endfor %}
   </div>
-</main>
+</div>
 
 <footer class="footer footer-main">
-  <div>Model Ready â€¢ 15 Classes â€¢ Custom 5-Block CNN â€¢ TensorFlow â€¢ Flask</div>
+  <div>Model Ready • 15 Classes • Custom 5-Block CNN • TensorFlow • Flask</div>
   <div class="footer-tech">Plant Disease Detection</div>
 </footer>
-
 </body>
 </html>
