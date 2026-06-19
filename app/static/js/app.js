@@ -1,5 +1,5 @@
 /* =============================================================================
-   app.js — Frontend logic for Plant Disease Detection
+   app.js ï¿½ Frontend logic for Plant Disease Detection
    Handles upload, prediction fetch, and results rendering
 ============================================================================= */
 (function () {
@@ -103,17 +103,16 @@
     resultThumb.src = data.image_data;
     resultTopName.textContent = top.display_name;
     resultTopConf.textContent = `Confidence: ${top.confidence}%`;
-    resultInfoClass.textContent = top.display_name;
-    resultInfoConfidence.textContent = `${top.confidence}%`;
+    
 
     const isLowConfidence = top.class_name === "uncertain_prediction" || top.confidence < 70;
     if (isLowConfidence) {
-      resultWarning.textContent = "? Low Confidence Prediction — This image may not belong to a supported crop class or the image quality may be insufficient.";
+      resultWarning.textContent = "? Low Confidence Prediction ï¿½ This image may not belong to a supported crop class or the image quality may be insufficient.";
       resultWarning.style.display = "block";
       resultSeverity.textContent = "Low confidence";
       resultSeverity.style.background = "rgba(250, 204, 21, 0.18)";
       resultSeverity.style.color = "#facc15";
-      resultInfoSeverity.textContent = "Low";
+      
       infoDesc.textContent = info.description || "Prediction confidence is low. Retake the image for a more reliable result.";
       infoSymptoms.textContent = info.symptoms || "Prediction confidence is low. Retake the image for a more reliable result.";
       infoTreatment.textContent = "Treatment recommendations are withheld for low confidence predictions.";
@@ -123,9 +122,9 @@
       resultSeverity.textContent = severity;
       resultSeverity.style.background = "rgba(46, 125, 50, 0.18)";
       resultSeverity.style.color = "var(--success)";
-      resultInfoSeverity.textContent = severity;
-      infoDesc.textContent = info.description || "—";
-      infoSymptoms.textContent = info.symptoms || "—";
+      
+      infoDesc.textContent = info.description || "ï¿½";
+      infoSymptoms.textContent = info.symptoms || "ï¿½";
       infoTreatment.textContent = info.treatment || "Consult an agricultural expert.";
     }
 
