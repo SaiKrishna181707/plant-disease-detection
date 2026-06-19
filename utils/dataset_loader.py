@@ -11,7 +11,10 @@ import sys
 import json
 import random
 import numpy as np
-import tensorflow as tf
+try:
+    import tensorflow as tf
+except ImportError:
+    tf = None
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from config import (

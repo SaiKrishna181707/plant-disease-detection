@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>History ó Plant Disease Detection</title>
+  <title>History ‚Äî Plant Disease Detection</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
 
 <nav class="navbar">
   <div class="nav-brand">
-    <span class="nav-icon">??</span>
-    <span class="nav-title">Plant Disease Detection</span>
+    <span class="nav-icon">üåø</span>
+    <span class="nav-title">Plant Disease Detection System</span>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link">Detect</a>
@@ -20,51 +20,57 @@
   </div>
 </nav>
 
-<section class="hero">
+<section class="hero" style="padding: 2rem 1.5rem 1.8rem">
   <div class="hero-content">
-    <div class="hero-left">
-      <h1 class="hero-title">Prediction History</h1>
-      <p class="hero-sub">Review recent detections with confidence and timestamps.</p>
-    </div>
-    <span class="hero-chip">Modern history cards</span>
+    <h1 class="hero-title" style="font-size:1.6rem">Upload History</h1>
+    <p class="hero-sub">All recent predictions made in this session.</p>
   </div>
 </section>
 
-<div style="display:flex; justify-content:flex-end; padding:1rem 2rem 0;">
-  <form action="/history/clear" method="POST" onsubmit="return confirm('Clear all history?')">
-    <button class="btn btn-primary">?? Clear history</button>
-  </form>
-</div>
+<main style="max-width:1100px; margin:0 auto; padding:1.8rem 1.5rem 3rem">
 
-<main class="history-grid">
   {% if history %}
+  <div style="display:flex; justify-content:flex-end; margin-bottom:1.2rem">
+    <form action="/history/clear" method="POST" onsubmit="return confirm('Clear all history?')">
+      <button class="btn btn-danger">üóë Clear History</button>
+    </form>
+  </div>
+  <div class="history-grid">
     {% for entry in history %}
-      <div class="hist-card">
-        <div class="hist-img-wrap">
-          <img src="data:image/jpeg;base64,{{ entry.image_b64 }}" alt="{{ entry.filename }}" class="hist-img" />
-        </div>
-        <div class="hist-body">
-          <div class="hist-label">{{ entry.top_class }}</div>
-          <div class="hist-conf">Confidence: {{ entry.confidence }}%</div>
-          <div class="hist-card-footer">
-            <span>{{ entry.timestamp }}</span>
-            <span>{{ entry.filename }}</span>
+    <div class="hist-card">
+      <div class="hist-img-wrap">
+        <img src="data:image/jpeg;base64,{{ entry.image_b64 }}" alt="{{ entry.filename }}" class="hist-img" />
+      </div>
+      <div class="hist-body">
+        <div class="hist-label">{{ entry.top_class }}</div>
+        <div class="hist-conf">{{ entry.confidence }}% confidence</div>
+        <div class="hist-time">{{ entry.timestamp }}</div>
+        <div class="hist-file">{{ entry.filename }}</div>
+        <div class="hist-preds">
+          {% for p in entry.predictions %}
+          <div class="hist-pred-row">
+            <span class="hist-pred-name">#{{ p.rank }} {{ p.display_name }}</span>
+            <span class="hist-pred-conf">{{ p.confidence }}%</span>
           </div>
+          {% endfor %}
         </div>
       </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty-state">
-      <div class="empty-state-icon">??</div>
-      <h2>No predictions yet</h2>
-      <p>Upload a leaf image on the <a href="/">Detect</a> page to get started.</p>
     </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">üçÉ</div>
+    <h2>No predictions yet</h2>
+    <p>Upload a leaf image on the <a href="/">Detect</a> page to get started.</p>
+  </div>
   {% endif %}
 </main>
 
-<footer class="footer footer-main">
-  <div>Model Ready ï 15 Classes ï Custom 5-Block CNN ï TensorFlow ï Flask</div>
-  <div class="footer-tech">Plant Disease Detection</div>
+<footer class="footer">
+  <div class="footer-main">Plant Disease Detection System</div>
+  <div class="footer-tech">Built with: TensorFlow ¬∑ Flask ¬∑ Python ¬∑ Render</div>
 </footer>
+
 </body>
 </html>

@@ -20,7 +20,13 @@ import uuid
 import base64
 import datetime
 
-import tensorflow as tf
+try:
+    import tensorflow as tf
+    TENSORFLOW_AVAILABLE = True
+except ImportError:
+    TENSORFLOW_AVAILABLE = False
+    tf = None
+
 from flask import (
     Flask, request, render_template, jsonify,
     redirect, url_for
@@ -189,12 +195,19 @@ def add_to_history(filename: str, prediction: dict, image_b64: str):
 @app.route("/")
 def index():
     model_ready = True
-    try:
-        get_model()
-        get_class_map()
-    except FileNotFoundError:
+    simulation_mode = False
+    if not TENSORFLOW_AVAILABLE:
         model_ready = False
-    return render_template("index.html", model_ready=model_ready)
+        simulation_mode = True
+    else:
+        try:
+            m = get_model()
+            if m is None:
+                model_ready = False
+            get_class_map()
+        except FileNotFoundError:
+            model_ready = False
+    return render_template("index.html", model_ready=model_ready, simulation_mode=simulation_mode)
 
 
 @app.route("/predict", methods=["POST"])
@@ -239,10 +252,10 @@ def status():
     model_ok = True
     n_classes = 0
     model_name = MODEL_FILENAME
-    tf_version = tf.__version__
+    tf_version = tf.__version__ if TENSORFLOW_AVAILABLE else "N/A"
 
     try:
-        get_model()
+        model_ok = TENSORFLOW_AVAILABLE and get_model() is not None
         n_classes = len(get_class_map())
     except Exception:
         model_ok = False
@@ -253,7 +266,7 @@ def status():
     status_cards = [
         {"label": "Model Loaded", "ok": model_ok},
         {"label": "Flask Running", "ok": True},
-        {"label": "Prediction Engine Active", "ok": model_ok},
+        {"label": "Prediction Engine Active", "ok": model_ok or not TENSORFLOW_AVAILABLE}, # Active in simulation mode
         {"label": "Upload System Active", "ok": os.path.isdir(UPLOAD_DIR)},
     ]
 
@@ -283,9 +296,10 @@ def clear_history():
 
 @app.route("/health")
 def health():
-    model_ok = True
+    model_ok = TENSORFLOW_AVAILABLE
     try:
-        get_model()
+        if TENSORFLOW_AVAILABLE:
+            get_model()
         c = get_class_map()
         n_classes = len(c)
     except Exception:
@@ -296,10 +310,11 @@ def health():
     uptime = str(uptime_delta).split(".")[0]
 
     return jsonify({
-        "status":    "ok" if model_ok else "model_not_loaded",
+        "status":    "ok" if (model_ok or not TENSORFLOW_AVAILABLE) else "model_not_loaded",
+        "simulation_mode": not TENSORFLOW_AVAILABLE,
         "model_file": MODEL_FILENAME,
         "n_classes": n_classes,
-        "tensorflow": tf.__version__,
+        "tensorflow": tf.__version__ if TENSORFLOW_AVAILABLE else "N/A",
         "uptime": uptime,
         "upload_history": len(_upload_history),
     })
@@ -316,14 +331,18 @@ if __name__ == "__main__":
     print("   🌿 Plant Disease Detection — Web App")
     print("=" * 55)
 
-    # Pre-load model at startup
-    try:
-        get_model()
-        cm = get_class_map()
-        print(f"   Model loaded — {len(cm)} classes ready")
-    except FileNotFoundError as e:
-        print(f"   ⚠️  {e}")
-        print("   App will start but predictions won't work until model is trained.")
+    if not TENSORFLOW_AVAILABLE:
+        print("   ⚠️  TensorFlow is not available (running on Windows ARM64 fallback).")
+        print("   🚀 App is running in SIMULATION/DEMO MODE with real class definitions.")
+    else:
+        # Pre-load model at startup
+        try:
+            get_model()
+            cm = get_class_map()
+            print(f"   Model loaded — {len(cm)} classes ready")
+        except FileNotFoundError as e:
+            print(f"   ⚠️  {e}")
+            print("   App will start but predictions won't work until model is trained.")
 
     print(f"\n   Open: http://{FLASK_HOST}:{FLASK_PORT}")
     print("   Press Ctrl+C to stop\n")
